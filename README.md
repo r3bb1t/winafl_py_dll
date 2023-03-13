@@ -3,14 +3,18 @@ This code provides simple integration with your python code for generating fuzzi
 It was intended to be as simple as it can be, so the people who are not familiar with Rust could still use and adjust it to 
 their own needs by only editing the python code.
 
+# Dependencies
+[Rust](https://www.rust-lang.org/tools/install)
+
+[Python 3.7+](https://www.python.org/downloads/)
 
 ## Short introduction
-This project itself, is a simple [custom mutator for WinAFL](https://github.com/googleprojectzero/winafl#custom-mutators) written in Rust.
+This project, itself, is a simple [custom mutator for WinAFL](https://github.com/googleprojectzero/winafl#custom-mutators) written in Rust.
 Generating dll is as simple as follows: <pre>cargo build --release</pre>
 
 
 ## How it works
-Generated dll expects a python script which **must** meet two conditions: *having a function named main* and *returning the bytes object*. Dll will read your python script and will feed it's input right into the fuzzer.
+The generated dll expects a python script which **must** meet two conditions: *having a function named main* and *returning the bytes object*. Dll will read your python script and will feed its input right into the fuzzer.
 
 
 ## Customization
