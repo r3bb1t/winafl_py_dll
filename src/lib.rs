@@ -1,8 +1,5 @@
 #![cfg(windows)]
 
-use winapi::shared::minwindef;
-use winapi::shared::minwindef::{BOOL, DWORD, HINSTANCE, LPVOID};
-
 #[macro_use]
 extern crate lazy_static;
 
@@ -12,11 +9,13 @@ lazy_static! {
 }
 
 use pyo3::prelude::*;
+use pyo3::types::{PyByteArray, PyDict};
+
 use std::error::Error;
 use std::slice;
 use std::sync::Mutex;
 
-use pyo3::types::PyDict;
+use winapi::shared::minwindef::{self, BOOL, DWORD, HINSTANCE, LPVOID};
 
 const ENV_SCRIPT_PATH: &str = "winafl_py_script";
 const ENV_DONT_SKIP_MUTATIONS: &str = "winafl_py_dont_skip_mutations";
@@ -57,7 +56,6 @@ extern "system" fn DllMain(dll_module: HINSTANCE, call_reason: DWORD, reserved: 
     minwindef::TRUE
 }
 
-
 type CommonFuzzStuff = unsafe extern "C" fn(argv: u64, newbuf: *mut u8, len: u32) -> u8;
 
 #[no_mangle]
@@ -76,8 +74,6 @@ pub unsafe fn dll_mutate_testcase(
     if *SKIP_MUTATIONS.lock().unwrap() { 1 } else { 0 }
 }
 
-
-
 /// Calls main() from python's script and tries to get it's return value as a vector
 ///
 /// Function is called as follows:
@@ -85,15 +81,16 @@ pub unsafe fn dll_mutate_testcase(
 /// main(buf, len, buf = buf, len = len)
 pub fn get_testcase_from_python(buf: &[u8], len: u32) -> PyResult<Vec<u8>> {
     Python::with_gil(|py| {
+        let _buf = PyByteArray::new(py, buf);
         let kwargs = PyDict::new(py);
-        kwargs.set_item("buf", buf)?;
+        kwargs.set_item("buf", _buf)?;
         kwargs.set_item("len", len)?;
 
         let fun: Py<PyAny> = PyModule::from_code(py, &CODE.lock().unwrap(), "", "")?
             .getattr("main")?
             .into();
 
-        let result = fun.call(py, (buf, len), Some(kwargs))?;
+        let result = fun.call(py, (_buf, len), Some(kwargs))?;
 
         let r: Vec<u8> = result.extract(py)?;
         Ok(r)

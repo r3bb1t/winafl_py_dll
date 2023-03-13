@@ -14,7 +14,7 @@ Generating dll is as simple as follows: <pre>cargo build --release</pre>
 
 
 ## How it works
-The generated dll expects a python script which **must** meet two conditions: *having a function named main* and *returning the bytes object*. Dll will read your python script and will feed its input right into the fuzzer.
+The generated dll expects a python script which **must** meet two conditions: *having a function named main* and *returning the bytes (or bytearray) object*. Dll will read your python script and will feed its input right into the fuzzer.
 
 
 ## Customization
