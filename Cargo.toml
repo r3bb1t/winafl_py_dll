@@ -1,0 +1,21 @@
+[package]
+name = "winafl_py_dll"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lazy_static = "1.4.0"
+pyo3 = { version = "0.18.1", features = ["auto-initialize"] }
+winapi = { version = "0.3.9", features = ["consoleapi", "minwindef"] }
+
+[lib]
+name = "py_dll"
+path = "src/lib.rs"
+crate-type = ["dylib"]
+
+
+
+
+
