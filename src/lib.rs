@@ -90,7 +90,12 @@ pub fn get_testcase_from_python(buf: &[u8], len: u32) -> PyResult<Vec<u8>> {
             .getattr("main")?
             .into();
 
-        let result = fun.call(py, (_buf, len), Some(kwargs))?;
+        let result = fun
+            .call(py, (_buf, len), Some(kwargs))
+            .map_err(|e| {
+                e.print_and_set_sys_last_vars(py);
+            })
+            .unwrap();
 
         let r: Vec<u8> = result.extract(py)?;
         Ok(r)
